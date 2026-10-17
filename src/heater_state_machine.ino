@@ -27,7 +27,7 @@ const float POT_FILTER = 0.2;        // smoothing, 0..1 (lower = smoother)
 
 const unsigned long DEBOUNCE_MS          = 30;
 const unsigned long SHOW_SETPOINT_MS     = 3000;
-const unsigned long EDIT_TIMEOUT_MS      = 3000;  // cancel edit after this long without pot movement
+const unsigned long EDIT_TIMEOUT_MS      = 6000;  // cancel edit after this long without pot movement
 const unsigned long DISPLAY_REFRESH_MS   = 100;
 
 const int sampleTime = 800;
@@ -55,6 +55,12 @@ struct Button {
 
 Button btn1 = { BTN1_PIN, false, false, 0 };
 Button btn2 = { BTN2_PIN, false, false, 0 };
+
+
+enum State { STATE_SHOW_TEMP, STATE_SHOW_SETPOINT, STATE_EDIT_SETPOINT };
+State state = STATE_SHOW_TEMP;
+unsigned long stateEnteredAt = 0;
+unsigned long lastEditActivity = 0;
 
 bool buttonPressed(Button &b) {
   unsigned long now = millis();
@@ -89,10 +95,7 @@ void updatePotFilter() {
 }
 
 // ---------- State machine ----------
-enum State { STATE_SHOW_TEMP, STATE_SHOW_SETPOINT, STATE_EDIT_SETPOINT };
-State state = STATE_SHOW_TEMP;
-unsigned long stateEnteredAt = 0;
-unsigned long lastEditActivity = 0;
+
 
 void enterState(State s) {
   state = s;
